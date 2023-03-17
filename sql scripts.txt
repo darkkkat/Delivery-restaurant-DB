@@ -1,0 +1,307 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 ;
+USE `mydb` ;
+
+-- -----------------------------------------------------
+-- Table `mydb`.`products`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`products` (
+  `product_id` INT NOT NULL AUTO_INCREMENT,
+  `menu_name` VARCHAR(80) NOT NULL,
+  `price` FLOAT NOT NULL,
+  PRIMARY KEY (`product_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`customers`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`customers` (
+  `customer_id` INT NOT NULL,
+  `firs_name` VARCHAR(30) NOT NULL,
+  `last_name` VARCHAR(35) NOT NULL,
+  `phone_number` VARCHAR(20) NOT NULL,
+  `district` VARCHAR(45) NOT NULL,
+  `street` VARCHAR(25) NOT NULL,
+  `house` INT NOT NULL,
+  `apartment` INT NOT NULL,
+  PRIMARY KEY (`customer_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`orders`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`orders` (
+  `order_id` INT NOT NULL,
+  `customers_id` INT NOT NULL,
+  `date_get` TIMESTAMP NOT NULL COMMENT 'the time when orders are gotten from customers',
+  PRIMARY KEY (`order_id`),
+  INDEX `fk_orders_customers1_idx` (`customers_id` ASC) VISIBLE,
+  CONSTRAINT `fk_orders_customers1`
+    FOREIGN KEY (`customers_id`)
+    REFERENCES `mydb`.`customers` (`customer_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`orders_products`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`orders_products` (
+  `order_id` INT NOT NULL,
+  `product_id` INT NOT NULL,
+  `quantity` INT NOT NULL,
+  INDEX `fk_orders_products_products_idx` (`product_id` ASC) VISIBLE,
+  PRIMARY KEY (`order_id`, `product_id`),
+  INDEX `fk_orders_products_orders1_idx` (`order_id` ASC) VISIBLE,
+  CONSTRAINT `fk_orders_products_products`
+    FOREIGN KEY (`product_id`)
+    REFERENCES `mydb`.`products` (`product_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_orders_products_orders1`
+    FOREIGN KEY (`order_id`)
+    REFERENCES `mydb`.`orders` (`order_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`courier_info`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`courier_info` (
+  `courier_id` INT NOT NULL,
+  `first_name` VARCHAR(30) NOT NULL,
+  `last_name` VARCHAR(30) NOT NULL,
+  `phone_number` VARCHAR(20) NOT NULL,
+  `delivery_type` VARCHAR(5) NOT NULL,
+  PRIMARY KEY (`courier_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`delivery_list`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`delivery_list` (
+  `delivery_id` INT NOT NULL,
+  `order_id` INT NOT NULL,
+  `courier_id` INT NOT NULL,
+  `date_arrived` TIMESTAMP NULL COMMENT 'the time when couriers bring ordes to clients',
+  `taken` VARCHAR(3) NOT NULL COMMENT 'it means whether a client\'s taken its order or not',
+  `payment_method` VARCHAR(4) NULL,
+  PRIMARY KEY (`delivery_id`),
+  INDEX `fk_delivery_list_orders1_idx` (`order_id` ASC) VISIBLE,
+  INDEX `fk_delivery_list_courier_info1_idx` (`courier_id` ASC) VISIBLE,
+  CONSTRAINT `fk_delivery_list_orders1`
+    FOREIGN KEY (`order_id`)
+    REFERENCES `mydb`.`orders` (`order_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_delivery_list_courier_info1`
+    FOREIGN KEY (`courier_id`)
+    REFERENCES `mydb`.`courier_info` (`courier_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`year_statistics`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`year_statistics` (
+  `id_month` INT NOT NULL AUTO_INCREMENT,
+  `month_name` VARCHAR(10) NOT NULL,
+  `amount_of_orders` INT NOT NULL COMMENT 'total amount of orders per month',
+  `couriers_shifts_per_month` INT NOT NULL COMMENT 'number of the shifts in total for all the courier per month',
+  `average_check` FLOAT NOT NULL COMMENT 'average check for 1 customer in the current month',
+  PRIMARY KEY (`id_month`),
+  UNIQUE INDEX `month_name_UNIQUE` (`month_name` ASC) VISIBLE)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+-- -----------------------------------------------------
+-- Data for table `mydb`.`products`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `mydb`;
+INSERT INTO `mydb`.`products` (`product_id`, `menu_name`, `price`) VALUES (1, 'GOJIRA ROLL', 200);
+INSERT INTO `mydb`.`products` (`product_id`, `menu_name`, `price`) VALUES (2, 'MOSCOW ROLL', 350);
+INSERT INTO `mydb`.`products` (`product_id`, `menu_name`, `price`) VALUES (3, 'FUTOMAKI ROLL', 400);
+INSERT INTO `mydb`.`products` (`product_id`, `menu_name`, `price`) VALUES (4, 'FILADELFIA ROLL', 225);
+INSERT INTO `mydb`.`products` (`product_id`, `menu_name`, `price`) VALUES (5, 'YNAGI MAKI ', 325);
+INSERT INTO `mydb`.`products` (`product_id`, `menu_name`, `price`) VALUES (6, 'CAESAR SALAD', 280);
+INSERT INTO `mydb`.`products` (`product_id`, `menu_name`, `price`) VALUES (7, 'SAHIMI SALAD', 310);
+INSERT INTO `mydb`.`products` (`product_id`, `menu_name`, `price`) VALUES (8, 'GREEN TEA', 110);
+INSERT INTO `mydb`.`products` (`product_id`, `menu_name`, `price`) VALUES (9, 'COFFEE', 120);
+INSERT INTO `mydb`.`products` (`product_id`, `menu_name`, `price`) VALUES (10, 'WATER', 60);
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `mydb`.`customers`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `mydb`;
+INSERT INTO `mydb`.`customers` (`customer_id`, `firs_name`, `last_name`, `phone_number`, `district`, `street`, `house`, `apartment`) VALUES (1, 'Mark', 'Williams', '+782532431126', 'Ramenki', 'Minsk street', 9, 43);
+INSERT INTO `mydb`.`customers` (`customer_id`, `firs_name`, `last_name`, `phone_number`, `district`, `street`, `house`, `apartment`) VALUES (2, 'Michel ', 'Peters', '+75645981120', 'Zamoskvorechye', 'Gross street', 8, 231);
+INSERT INTO `mydb`.`customers` (`customer_id`, `firs_name`, `last_name`, `phone_number`, `district`, `street`, `house`, `apartment`) VALUES (3, 'Ivan', 'Gibson', '+7309341704128', 'Khamovniki', 'Kolymazhny Lane', 1, 23);
+INSERT INTO `mydb`.`customers` (`customer_id`, `firs_name`, `last_name`, `phone_number`, `district`, `street`, `house`, `apartment`) VALUES (4, 'Anatoliy', 'Martin', '+749601746334', 'Ramenki', 'Pyreva street', 2, 6);
+INSERT INTO `mydb`.`customers` (`customer_id`, `firs_name`, `last_name`, `phone_number`, `district`, `street`, `house`, `apartment`) VALUES (5, 'Sandra', 'Evans', '+756505430858', 'Zamoskvorechye', 'Zatsepsky impasse', 12, 74);
+INSERT INTO `mydb`.`customers` (`customer_id`, `firs_name`, `last_name`, `phone_number`, `district`, `street`, `house`, `apartment`) VALUES (6, 'Mary', 'Stone', '+7992767078252', 'Zamoskvorechye', 'Tatar street', 4, 34);
+INSERT INTO `mydb`.`customers` (`customer_id`, `firs_name`, `last_name`, `phone_number`, `district`, `street`, `house`, `apartment`) VALUES (7, 'Vladislav', 'Jordan', '+7853398504945', 'Ramenki', 'Lenin\'s mountains', 64, 78);
+INSERT INTO `mydb`.`customers` (`customer_id`, `firs_name`, `last_name`, `phone_number`, `district`, `street`, `house`, `apartment`) VALUES (8, 'Bogdan', 'Jackson', '+7938806773742', 'Ramenki', 'Mendeleevskaya street', 75, 1);
+INSERT INTO `mydb`.`customers` (`customer_id`, `firs_name`, `last_name`, `phone_number`, `district`, `street`, `house`, `apartment`) VALUES (9, 'Daniil', 'Grant', '+7948811010515', 'Khamovniki', 'Crimean bridge', 8, 64);
+INSERT INTO `mydb`.`customers` (`customer_id`, `firs_name`, `last_name`, `phone_number`, `district`, `street`, `house`, `apartment`) VALUES (10, 'Nikita', 'Davis', '+760432472049', 'Izmailovo', 'Izmailovsky boulevard', 3, 97);
+INSERT INTO `mydb`.`customers` (`customer_id`, `firs_name`, `last_name`, `phone_number`, `district`, `street`, `house`, `apartment`) VALUES (11, 'Andrey', 'Collins', '+714641920141', 'Izmailovo', 'Pervomaisky passage', 3, 99);
+INSERT INTO `mydb`.`customers` (`customer_id`, `firs_name`, `last_name`, `phone_number`, `district`, `street`, `house`, `apartment`) VALUES (12, 'Daria', 'Roberts', '+75702006649', 'Khamovniki', 'Serpov Lane', 56, 101);
+INSERT INTO `mydb`.`customers` (`customer_id`, `firs_name`, `last_name`, `phone_number`, `district`, `street`, `house`, `apartment`) VALUES (13, 'Anastasia', 'Mills', '+71151575289', 'Zamoskvorechye', 'Zhukov passage', 2, 566);
+INSERT INTO `mydb`.`customers` (`customer_id`, `firs_name`, `last_name`, `phone_number`, `district`, `street`, `house`, `apartment`) VALUES (14, 'Varvara', 'Morgan', '+772475222625', 'Ramenki', 'Borodinsky bridge', 12, 49);
+INSERT INTO `mydb`.`customers` (`customer_id`, `firs_name`, `last_name`, `phone_number`, `district`, `street`, `house`, `apartment`) VALUES (15, 'Pavel', 'Barlow', '+7323749254411', 'Khamovniki', 'Trubetskaya street', 43, 20);
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `mydb`.`orders`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `mydb`;
+INSERT INTO `mydb`.`orders` (`order_id`, `customers_id`, `date_get`) VALUES (1, 1, NOW());
+INSERT INTO `mydb`.`orders` (`order_id`, `customers_id`, `date_get`) VALUES (2, 2, NOW());
+INSERT INTO `mydb`.`orders` (`order_id`, `customers_id`, `date_get`) VALUES (3, 3, NOW());
+INSERT INTO `mydb`.`orders` (`order_id`, `customers_id`, `date_get`) VALUES (4, 4, NOW());
+INSERT INTO `mydb`.`orders` (`order_id`, `customers_id`, `date_get`) VALUES (5, 5, NOW());
+INSERT INTO `mydb`.`orders` (`order_id`, `customers_id`, `date_get`) VALUES (6, 6, NOW());
+INSERT INTO `mydb`.`orders` (`order_id`, `customers_id`, `date_get`) VALUES (7, 7, NOW());
+INSERT INTO `mydb`.`orders` (`order_id`, `customers_id`, `date_get`) VALUES (8, 8, NOW());
+INSERT INTO `mydb`.`orders` (`order_id`, `customers_id`, `date_get`) VALUES (9, 9, NOW());
+INSERT INTO `mydb`.`orders` (`order_id`, `customers_id`, `date_get`) VALUES (10, 10, NOW());
+INSERT INTO `mydb`.`orders` (`order_id`, `customers_id`, `date_get`) VALUES (11, 11, NOW());
+INSERT INTO `mydb`.`orders` (`order_id`, `customers_id`, `date_get`) VALUES (12, 12, NOW());
+INSERT INTO `mydb`.`orders` (`order_id`, `customers_id`, `date_get`) VALUES (13, 13, NOW());
+INSERT INTO `mydb`.`orders` (`order_id`, `customers_id`, `date_get`) VALUES (14, 14, NOW());
+INSERT INTO `mydb`.`orders` (`order_id`, `customers_id`, `date_get`) VALUES (15, 15, NOW());
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `mydb`.`orders_products`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `mydb`;
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (1, 1, 2);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (1, 4, 1);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (1, 10, 1);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (2, 4, 1);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (2, 5, 1);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (3, 3, 1);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (4, 7, 2);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (5, 2, 1);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (5, 3, 1);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (6, 8, 3);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (7, 1, 1);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (7, 6, 4);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (8, 1, 2);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (9, 2, 1);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (9, 3, 1);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (10, 1, 2);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (10, 2, 1);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (11, 3, 2);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (12, 5, 2);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (12, 10, 1);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (13, 4, 2);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (14, 5, 1);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (15, 8, 1);
+INSERT INTO `mydb`.`orders_products` (`order_id`, `product_id`, `quantity`) VALUES (15, 7, 2);
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `mydb`.`courier_info`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `mydb`;
+INSERT INTO `mydb`.`courier_info` (`courier_id`, `first_name`, `last_name`, `phone_number`, `delivery_type`) VALUES (1, 'John', 'Frontal', '+75598620770', 'foot');
+INSERT INTO `mydb`.`courier_info` (`courier_id`, `first_name`, `last_name`, `phone_number`, `delivery_type`) VALUES (2, 'Kate', 'Looran', '+79122130482', 'car');
+INSERT INTO `mydb`.`courier_info` (`courier_id`, `first_name`, `last_name`, `phone_number`, `delivery_type`) VALUES (3, 'Bob', 'Rython', '+75694844608', 'car');
+INSERT INTO `mydb`.`courier_info` (`courier_id`, `first_name`, `last_name`, `phone_number`, `delivery_type`) VALUES (4, 'Michael', 'Kolaris', '+70918215299', 'car');
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `mydb`.`delivery_list`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `mydb`;
+INSERT INTO `mydb`.`delivery_list` (`delivery_id`, `order_id`, `courier_id`, `date_arrived`, `taken`, `payment_method`) VALUES (1, 1, 3, '2022-12-1 17:59:15', 'Yes', 'Cash');
+INSERT INTO `mydb`.`delivery_list` (`delivery_id`, `order_id`, `courier_id`, `date_arrived`, `taken`, `payment_method`) VALUES (2, 2, 4, '2022-12-1 18:01:05', 'Yes', 'Card');
+INSERT INTO `mydb`.`delivery_list` (`delivery_id`, `order_id`, `courier_id`, `date_arrived`, `taken`, `payment_method`) VALUES (3, 3, 1, '2022-12-1 18:04:36', 'Yes', 'Cash');
+INSERT INTO `mydb`.`delivery_list` (`delivery_id`, `order_id`, `courier_id`, `date_arrived`, `taken`, `payment_method`) VALUES (4, 4, 2, '2022-12-16 18:03:11', 'Yes', 'Cash');
+INSERT INTO `mydb`.`delivery_list` (`delivery_id`, `order_id`, `courier_id`, `date_arrived`, `taken`, `payment_method`) VALUES (5, 5, 1, '2022-12-1 18:19:56', 'Yes', 'Cash');
+INSERT INTO `mydb`.`delivery_list` (`delivery_id`, `order_id`, `courier_id`, `date_arrived`, `taken`, `payment_method`) VALUES (6, 6, 3, '2022-12-1 18:18:44', 'Yes', 'Card');
+INSERT INTO `mydb`.`delivery_list` (`delivery_id`, `order_id`, `courier_id`, `date_arrived`, `taken`, `payment_method`) VALUES (7, 7, 2, '2022-12-1 18:50:11', 'No', 'NULL'); # the order's arrived too late
+INSERT INTO `mydb`.`delivery_list` (`delivery_id`, `order_id`, `courier_id`, `date_arrived`, `taken`, `payment_method`) VALUES (8, 8, 4, '2022-12-1 18:35:07', 'Yes', 'Card');
+INSERT INTO `mydb`.`delivery_list` (`delivery_id`, `order_id`, `courier_id`, `date_arrived`, `taken`, `payment_method`) VALUES (9, 9, 4, '2022-12-1 18:58:28', 'No', 'NULL'); # the order's arrived too late
+INSERT INTO `mydb`.`delivery_list` (`delivery_id`, `order_id`, `courier_id`, `date_arrived`, `taken`, `payment_method`) VALUES (10, 10, 3, '2022-12-1 18:36:51', 'Yes', 'Card');
+INSERT INTO `mydb`.`delivery_list` (`delivery_id`, `order_id`, `courier_id`, `date_arrived`, `taken`, `payment_method`) VALUES (11, 11, 2, '2022-12-1 19:10:34', 'Yes', 'Cash');
+INSERT INTO `mydb`.`delivery_list` (`delivery_id`, `order_id`, `courier_id`, `date_arrived`, `taken`, `payment_method`) VALUES (12, 12, 1, NULL, 'No', NULL); #  the products are out of stock
+INSERT INTO `mydb`.`delivery_list` (`delivery_id`, `order_id`, `courier_id`, `date_arrived`, `taken`, `payment_method`) VALUES (13, 13, 2, '2022-12-1 19:17:04', 'Yes', 'Cash');
+INSERT INTO `mydb`.`delivery_list` (`delivery_id`, `order_id`, `courier_id`, `date_arrived`, `taken`, `payment_method`) VALUES (14, 14, 3, '2022-12-1 18:56:17', 'Yes', 'Card');
+INSERT INTO `mydb`.`delivery_list` (`delivery_id`, `order_id`, `courier_id`, `date_arrived`, `taken`, `payment_method`) VALUES (15, 15, 4, '2022-12-1 19:05:29', 'Yes', 'Card');
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `mydb`.`year_statistics`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `mydb`;
+INSERT INTO `mydb`.`year_statistics` (`id_month`, `month_name`, `amount_of_orders`, `couriers_shifts_per_month`, `average_check`) VALUES (1, 'January', 350, 120, 750);
+INSERT INTO `mydb`.`year_statistics` (`id_month`, `month_name`, `amount_of_orders`, `couriers_shifts_per_month`, `average_check`) VALUES (2, 'February', 211, 88, 1245);
+INSERT INTO `mydb`.`year_statistics` (`id_month`, `month_name`, `amount_of_orders`, `couriers_shifts_per_month`, `average_check`) VALUES (3, 'March', 298, 101, 1020);
+INSERT INTO `mydb`.`year_statistics` (`id_month`, `month_name`, `amount_of_orders`, `couriers_shifts_per_month`, `average_check`) VALUES (4, 'April', 312, 105, 1025);
+INSERT INTO `mydb`.`year_statistics` (`id_month`, `month_name`, `amount_of_orders`, `couriers_shifts_per_month`, `average_check`) VALUES (5, 'May', 405, 121, 865);
+INSERT INTO `mydb`.`year_statistics` (`id_month`, `month_name`, `amount_of_orders`, `couriers_shifts_per_month`, `average_check`) VALUES (6, 'June', 401, 121, 580);
+INSERT INTO `mydb`.`year_statistics` (`id_month`, `month_name`, `amount_of_orders`, `couriers_shifts_per_month`, `average_check`) VALUES (7, 'July', 346, 118, 1020);
+INSERT INTO `mydb`.`year_statistics` (`id_month`, `month_name`, `amount_of_orders`, `couriers_shifts_per_month`, `average_check`) VALUES (8, 'August', 318, 117, 1180);
+INSERT INTO `mydb`.`year_statistics` (`id_month`, `month_name`, `amount_of_orders`, `couriers_shifts_per_month`, `average_check`) VALUES (9, 'September', 377, 115, 870);
+INSERT INTO `mydb`.`year_statistics` (`id_month`, `month_name`, `amount_of_orders`, `couriers_shifts_per_month`, `average_check`) VALUES (10, 'October', 385, 119, 900);
+INSERT INTO `mydb`.`year_statistics` (`id_month`, `month_name`, `amount_of_orders`, `couriers_shifts_per_month`, `average_check`) VALUES (11, 'November', 381, 120, 910);
+INSERT INTO `mydb`.`year_statistics` (`id_month`, `month_name`, `amount_of_orders`, `couriers_shifts_per_month`, `average_check`) VALUES (12, 'December', 429, 121, 1055);
+
+COMMIT;
+
+-- Запрос 1. Показать список книг, имеющих жанр "Детектив", "Триллер" 
+select book_name, group_concat(genre_name separator ', ') as genres from books 
+join m2m_books_genres on books.book_id = m2m_books_genres.books_book_id
+join genres on genres.genre_id = m2m_books_genres.genres_genre_id
+where genre_id = 1 or genre_id = 2
+group by book_name
+having group_concat(genre_name separator ', ') = 'Детектив, Триллер'
+or group_concat(genre_name separator ', ') = 'Триллер, Детектив';
+
+select 
